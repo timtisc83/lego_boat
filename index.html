@@ -1,1 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estimate + Timer Task</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0f17;
+      --panel:#0f172a;
+      --panel2:#0b1224;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --line:rgba(255,255,255,.08);
+      --accent:#7c3aed;
+      --accent2:#22c55e;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --good:#22c55e;
+      --chip:#111827;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(1200px 700px at 20% -10%, rgba(124,58,237,.35), transparent 60%),
+                         radial-gradient(900px 600px at 90% 0%, rgba(34,197,94,.18), transparent 55%),
+                         var(--bg);
+         color:var(--text);min-height:100vh}
+
+    .topbar{position:sticky;top:0;z-index:10;background:linear-gradient(to bottom, rgba(11,15,23,.96), rgba(11,15,23,.75));
+      backdrop-filter: blur(10px);border-bottom:1px solid var(--line)}
+    .topbar-inner{max-width:980px;margin:0 auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:baseline;gap:10px}
+    .brand b{font-weight:800;letter-spacing:.2px}
+    .brand span{font-size:12px;color:var(--muted)}
+
+    .wrap{max-width:980px;margin:0 auto;padding:22px 18px 60px}
+    .grid{display:grid;grid-template-columns: 1.1fr .9fr;gap:18px;align-items:start}
+    @media (max-width: 920px){.grid{grid-template-columns:1fr}}
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 50px rgba(0,0,0,.35);overflow:hidden}
+    .card-h{padding:18px 18px 0}
+    h1{font-size:28px;line-height:1.05;margin-bottom:8px}
+    .sub{color:var(--muted);font-size:14px;line-height:1.6}
+
+    .steps{padding:14px 18px 18px;display:grid;gap:10px}
+    .step{display:flex;gap:12px;align-items:flex-start;padding:12px 12px;border-radius:12px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.06)}
+    .dot{width:28px;height:28px;border-radius:10px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);
+      display:flex;align-items:center;justify-content:center;font-weight:800;color:#c4b5fd;flex:0 0 auto}
+    .step p{font-size:13px;color:var(--text);line-height:1.45}
+    .step p small{color:var(--muted)}
+
+    .panel{padding:18px}
+    .field{display:grid;gap:8px;margin-bottom:14px}
+    label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+    input[type=number]{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.25);color:var(--text);outline:none;font-size:16px}
+    input[type=number]:focus{border-color:rgba(124,58,237,.7);box-shadow:0 0 0 4px rgba(124,58,237,.18)}
+
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn{border:0;border-radius:12px;padding:12px 14px;font-weight:700;cursor:pointer;transition:transform .06s ease, opacity .2s ease;
+      display:inline-flex;align-items:center;justify-content:center;gap:10px}
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{background:linear-gradient(135deg, rgba(124,58,237,1), rgba(34,197,94,.85));color:white}
+    .btn-ghost{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text)}
+    .btn-danger{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#fecaca}
+    .btn[disabled]{opacity:.5;cursor:not-allowed}
+
+    .timerBox{margin-top:12px;padding:14px;border-radius:14px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.08)}
+    .timerBig{font-size:44px;font-weight:800;letter-spacing:.5px}
+    .timerMeta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;color:var(--muted);font-size:13px}
+    .chip{display:inline-flex;gap:8px;align-items:center;background:rgba(17,24,39,.7);border:1px solid rgba(255,255,255,.08);
+      border-radius:999px;padding:6px 10px}
+
+    .feedback{margin-top:14px;padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.08);display:none}
+    .feedback.good{background:rgba(34,197,94,.10);border-color:rgba(34,197,94,.25)}
+    .feedback.bad{background:rgba(239,68,68,.10);border-color:rgba(239,68,68,.25)}
+    .feedback.neutral{background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.25)}
+    .feedback h3{font-size:14px;margin-bottom:6px}
+    .feedback p{font-size:13px;line-height:1.55;color:var(--text)}
+
+    /* host */
+    .hostOnly{display:none}
+    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0}
+    @media (max-width:920px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    .kpi{padding:14px;border-radius:14px;background:rgba(0,0,0,.20);border:1px solid rgba(255,255,255,.08)}
+    .kpi b{display:block;font-size:26px;letter-spacing:.3px}
+    .kpi span{color:var(--muted);font-size:12px}
+
+    .mini{color:var(--muted);font-size:12px;line-height:1.6}
+
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th,td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top}
+    th{text-align:left;color:#c7d2fe;background:rgba(124,58,237,.10)}
+    tr:hover td{background:rgba(255,255,255,.03)}
+
+    .bar{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+    .bar > i{display:block;height:100%;background:linear-gradient(90deg, rgba(124,58,237,1), rgba(34,197,94,.9))}
+
+    .err{color:#fecaca;font-size:13px;display:none;margin-top:10px}
+    a{color:#c4b5fd}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><b>Estimate → Timer</b><span>Student link: same URL · Host: add <code>?host=true</code></span></div>
+      <div class="mini" id="status">Supabase: …</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- STUDENT -->
+    <div id="student" class="grid">
+      <div class="card">
+        <div class="card-h">
+          <h1>Enter your estimate<br>and start your timer here</h1>
+          <p class="sub">See QR code or click link (<a href="https://shorturl.at/ny0Nv" target="_blank" rel="noreferrer">https://shorturl.at/ny0Nv</a>). Enter your estimate in <b>seconds</b>, then run the task.</p>
+        </div>
+        <div class="steps">
+          <div class="step"><div class="dot">1</div><p><b>Enter your estimate</b> <small>(in seconds)</small></p></div>
+          <div class="step"><div class="dot">2</div><p><b>Click “Start”</b> <small>and begin building</small></p></div>
+          <div class="step"><div class="dot">3</div><p><b>Click “Stop”</b> <small>when you finish building</small></p></div>
+          <div class="step"><div class="dot">4</div><p><b>Disassemble your project</b> <small>(not timed)</small></p></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="panel">
+          <div class="field">
+            <label>Estimate (seconds)</label>
+            <input id="estimate" type="number" inputmode="numeric" min="1" step="1" placeholder="e.g., 90" />
+            <div class="mini">Must be an integer number of seconds.</div>
+          </div>
+
+          <div class="row">
+            <button class="btn btn-primary" id="startBtn">Start</button>
+            <button class="btn btn-ghost" id="stopBtn" disabled>Stop</button>
+            <button class="btn btn-danger" id="resetBtn" disabled>Reset</button>
+          </div>
+
+          <div class="timerBox" aria-live="polite">
+            <div class="timerBig" id="timer">00:00</div>
+            <div class="timerMeta">
+              <span class="chip">Estimated: <b id="estChip">—</b>s</span>
+              <span class="chip">Elapsed: <b id="elapsedChip">0</b>s</span>
+              <span class="chip">Error: <b id="errChip">—</b>s</span>
+            </div>
+          </div>
+
+          <div class="feedback" id="feedback">
+            <h3 id="fbTitle">Feedback</h3>
+            <p id="fbText"></p>
+          </div>
+
+          <div class="err" id="submitErr">Submission failed. Please try again.</div>
+
+          <p class="mini" style="margin-top:14px">Data is stored anonymously for research/teaching purposes.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOST -->
+    <div id="host" class="hostOnly">
+      <div class="card">
+        <div class="panel">
+          <h1 style="font-size:24px">Host panel</h1>
+          <p class="sub">Live estimates vs. actual time (Start → Stop). Share the student link above.</p>
+
+          <div class="kpis">
+            <div class="kpi"><b id="k_total">0</b><span>Responses</span></div>
+            <div class="kpi"><b id="k_mean_err">—</b><span>Mean error (s): actual − estimate</span></div>
+            <div class="kpi"><b id="k_mae">—</b><span>Mean absolute error (s)</span></div>
+            <div class="kpi"><b id="k_share">—</b><span>Over vs. under</span></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start">
+            <div class="kpi" style="grid-column:1 / -1">
+              <b style="font-size:14px">Distribution of signed error</b>
+              <div class="mini">Negative = underestimation (took longer). Positive = overestimation (took shorter).</div>
+              <div style="margin-top:10px;display:grid;gap:10px" id="errBars"></div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+            <button class="btn btn-ghost" id="copyBtn">Copy student link</button>
+            <button class="btn btn-ghost" id="csvBtn">Export CSV</button>
+            <button class="btn btn-danger" id="wipeBtn">Reset all</button>
+            <span class="mini" id="lastUp">Waiting…</span>
+          </div>
+
+          <div style="margin-top:16px;overflow-x:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Estimate (s)</th>
+                  <th>Actual (s)</th>
+                  <th>Error (s)<br><span class="mini">actual − estimate</span></th>
+                  <th>Abs. error (s)</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="rows">
+                <tr><td colspan="6" style="color:var(--muted);text-align:center;padding:18px">No responses yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ---- Supabase config (reuse your existing project) ----
+  const SUPABASE_URL = 'https://uyynxszpmtwfxmnwirjn.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_urtblTmp0Y9ikKCBm-Forg_azXo9iQ6';
+
+  const TABLE = 'time_estimation_responses';
+  const GAME_KEY = 'odce_time_estimation_v1';
+
+  let db = null;
+  try {
+    const { createClient } = supabase;
+    db = createClient(SUPABASE_URL, SUPABASE_KEY);
+    document.getElementById('status').textContent = 'Supabase: connected';
+  } catch (e) {
+    document.getElementById('status').textContent = 'Supabase: NOT connected';
+  }
+
+  const isHost = new URLSearchParams(window.location.search).get('host') === 'true';
+  if (isHost) {
+    document.getElementById('student').style.display = 'none';
+    document.getElementById('host').classList.remove('hostOnly');
+  }
+
+  // ---- Student timer ----
+  let tick = null;
+  let t0 = null;
+  let elapsed = 0;
+
+  const estimateEl = document.getElementById('estimate');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  const timerEl = document.getElementById('timer');
+  const estChip = document.getElementById('estChip');
+  const elapsedChip = document.getElementById('elapsedChip');
+  const errChip = document.getElementById('errChip');
+
+  const feedback = document.getElementById('feedback');
+  const fbTitle = document.getElementById('fbTitle');
+  const fbText = document.getElementById('fbText');
+  const submitErr = document.getElementById('submitErr');
+
+  function fmtMMSS(sec){
+    const m = Math.floor(sec/60);
+    const s = sec % 60;
+    return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }
+
+  function getEstimate(){
+    const v = estimateEl.value.trim();
+    if (!v) return null;
+    const n = Number(v);
+    if (!Number.isFinite(n)) return null;
+    if (!Number.isInteger(n)) return null;
+    if (n <= 0) return null;
+    return n;
+  }
+
+  function updateUI(){
+    timerEl.textContent = fmtMMSS(elapsed);
+    elapsedChip.textContent = String(elapsed);
+
+    const est = getEstimate();
+    estChip.textContent = est ?? '—';
+
+    if (est != null && elapsed > 0){
+      const err = elapsed - est;
+      errChip.textContent = (err>0?'+':'') + String(err);
+    } else {
+      errChip.textContent = '—';
+    }
+  }
+
+  function showFeedback(est, actual){
+    const err = actual - est; // signed
+    const absErr = Math.abs(err);
+    const rel = absErr / est;
+
+    feedback.style.display = 'block';
+    feedback.classList.remove('good','bad','neutral');
+
+    // Thresholds: tight = 10% or <=10s, loose = 25% or <=20s
+    const tight = (rel <= 0.10) || (absErr <= 10);
+    const loose = (rel <= 0.25) || (absErr <= 20);
+
+    if (tight) {
+      feedback.classList.add('good');
+      fbTitle.textContent = 'Close estimate';
+      fbText.textContent = `Your estimate was close. Estimated ${est}s, actual ${actual}s (error ${err>0?'+':''}${err}s).`;
+    } else if (loose) {
+      feedback.classList.add('neutral');
+      fbTitle.textContent = 'Not bad';
+      fbText.textContent = `Estimated ${est}s, actual ${actual}s (error ${err>0?'+':''}${err}s). You were off by ${absErr}s.`;
+    } else {
+      feedback.classList.add('bad');
+      fbTitle.textContent = 'Large gap';
+      fbText.textContent = `Estimated ${est}s, actual ${actual}s (error ${err>0?'+':''}${err}s). Big difference (${absErr}s).`;
+    }
+  }
+
+  startBtn?.addEventListener('click', () => {
+    submitErr.style.display = 'none';
+    const est = getEstimate();
+    if (est == null){
+      alert('Please enter an integer estimate in seconds.');
+      return;
+    }
+    if (tick) return;
+
+    // lock estimate during run
+    estimateEl.disabled = true;
+
+    elapsed = 0;
+    t0 = Date.now();
+    updateUI();
+
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+    resetBtn.disabled = false;
+
+    feedback.style.display = 'none';
+
+    tick = setInterval(() => {
+      elapsed = Math.floor((Date.now() - t0)/1000);
+      updateUI();
+    }, 200);
+  });
+
+  stopBtn?.addEventListener('click', async () => {
+    if (!tick) return;
+    clearInterval(tick);
+    tick = null;
+
+    const est = getEstimate();
+    const actual = elapsed;
+
+    // allow editing after stop
+    estimateEl.disabled = false;
+
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+
+    updateUI();
+    showFeedback(est, actual);
+
+    // submit
+    if (!db){
+      submitErr.style.display = 'block';
+      submitErr.textContent = 'Supabase not connected. Cannot submit.';
+      return;
+    }
+
+    const payload = {
+      game_key: GAME_KEY,
+      estimate_seconds: est,
+      actual_seconds: actual,
+      error_seconds: actual - est,
+      abs_error_seconds: Math.abs(actual - est),
+      started_at: new Date(t0).toISOString(),
+      stopped_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+    };
+
+    try {
+      const { error } = await db.from(TABLE).insert(payload);
+      if (error) throw error;
+    } catch(e){
+      console.error(e);
+      submitErr.style.display = 'block';
+      submitErr.textContent = 'Submission failed. Please try again.';
+    }
+  });
+
+  resetBtn?.addEventListener('click', () => {
+    if (tick){
+      clearInterval(tick);
+      tick = null;
+    }
+    t0 = null;
+    elapsed = 0;
+    estimateEl.disabled = false;
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    resetBtn.disabled = true;
+    feedback.style.display = 'none';
+    updateUI();
+  });
+
+  estimateEl?.addEventListener('input', updateUI);
+  updateUI();
+
+  // ---- Host panel ----
+  const k_total = document.getElementById('k_total');
+  const k_mean_err = document.getElementById('k_mean_err');
+  const k_mae = document.getElementById('k_mae');
+  const k_share = document.getElementById('k_share');
+  const rowsEl = document.getElementById('rows');
+  const lastUp = document.getElementById('lastUp');
+  const errBars = document.getElementById('errBars');
+
+  async function loadHost(){
+    if (!db) return;
+    const { data, error } = await db.from(TABLE)
+      .select('*')
+      .eq('game_key', GAME_KEY)
+      .order('created_at', { ascending: true });
+    if (error){ console.error(error); return; }
+    renderHost(data || []);
+    lastUp.textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+  }
+
+  function renderHost(data){
+    const n = data.length;
+    k_total.textContent = String(n);
+    if (n === 0){
+      k_mean_err.textContent = '—';
+      k_mae.textContent = '—';
+      k_share.textContent = '—';
+      errBars.innerHTML = '<div class="mini">No data yet.</div>';
+      rowsEl.innerHTML = '<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:18px">No responses yet</td></tr>';
+      return;
+    }
+
+    const errs = data.map(r => Number(r.error_seconds)).filter(x => Number.isFinite(x));
+    const absErrs = data.map(r => Number(r.abs_error_seconds)).filter(x => Number.isFinite(x));
+
+    const meanErr = errs.reduce((a,b)=>a+b,0) / errs.length;
+    const mae = absErrs.reduce((a,b)=>a+b,0) / absErrs.length;
+
+    const over = errs.filter(e => e < 0).length;  // took longer than estimated
+    const under = errs.filter(e => e > 0).length; // took shorter
+    const exact = errs.filter(e => e === 0).length;
+
+    k_mean_err.textContent = (meanErr>0?'+':'') + meanErr.toFixed(1);
+    k_mae.textContent = mae.toFixed(1);
+    k_share.textContent = `${over} over / ${under} under / ${exact} exact`;
+
+    // Signed error bins
+    // bins: <=-60, -59..-31, -30..-11, -10..-1, 0, 1..10, 11..30, 31..60, >=61
+    const bins = [
+      { label: '≤ -60s', lo: -1e9, hi: -60 },
+      { label: '-59..-31', lo: -59, hi: -31 },
+      { label: '-30..-11', lo: -30, hi: -11 },
+      { label: '-10..-1', lo: -10, hi: -1 },
+      { label: '0', lo: 0, hi: 0 },
+      { label: '1..10', lo: 1, hi: 10 },
+      { label: '11..30', lo: 11, hi: 30 },
+      { label: '31..60', lo: 31, hi: 60 },
+      { label: '≥ 61', lo: 61, hi: 1e9 },
+    ];
+
+    const counts = bins.map(b => errs.filter(e => e >= b.lo && e <= b.hi).length);
+    const maxC = Math.max(...counts, 1);
+
+    errBars.innerHTML = bins.map((b, i) => {
+      const c = counts[i];
+      const w = (c / maxC) * 100;
+      return `
+        <div style="display:grid;grid-template-columns:110px 1fr 36px;gap:10px;align-items:center">
+          <div class="mini" style="color:var(--muted)">${b.label}</div>
+          <div class="bar"><i style="width:${w}%"></i></div>
+          <div class="mini" style="text-align:right">${c}</div>
+        </div>
+      `;
+    }).join('');
+
+    rowsEl.innerHTML = data.map((r, idx) => {
+      const est = Number(r.estimate_seconds);
+      const act = Number(r.actual_seconds);
+      const err = Number(r.error_seconds);
+      const absE = Number(r.abs_error_seconds);
+      const t = r.created_at ? new Date(r.created_at).toLocaleTimeString() : '—';
+      const errStr = (err>0?'+':'') + err;
+      return `
+        <tr>
+          <td>${idx+1}</td>
+          <td>${est}</td>
+          <td>${act}</td>
+          <td>${errStr}</td>
+          <td>${absE}</td>
+          <td style="color:var(--muted)">${t}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  if (isHost){
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      const url = window.location.href.split('?')[0];
+      navigator.clipboard.writeText(url).then(() => alert('Copied: ' + url));
+    });
+    document.getElementById('csvBtn').addEventListener('click', async () => {
+      if (!db) return;
+      const { data } = await db.from(TABLE).select('*').eq('game_key', GAME_KEY).order('created_at', { ascending: true });
+      if (!data || !data.length){ alert('No data.'); return; }
+      const headers = ['estimate_seconds','actual_seconds','error_seconds','abs_error_seconds','created_at'];
+      const csv = [headers.join(';'), ...data.map(r => headers.map(h => JSON.stringify(r[h] ?? '')).join(';'))].join('\n');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8'}));
+      a.download = 'time_estimation_responses.csv';
+      a.click();
+    });
+    document.getElementById('wipeBtn').addEventListener('click', async () => {
+      if (!confirm('Reset ALL responses?')) return;
+      const { error } = await db.from(TABLE).delete().eq('game_key', GAME_KEY);
+      if (error) alert('Delete failed');
+      await loadHost();
+    });
+
+    loadHost();
+    if (db){
+      db.channel('time-estimation')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: TABLE }, () => loadHost())
+        .subscribe();
+    }
+  }
+</script>
+</body>
+</html>
 
