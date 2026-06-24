@@ -274,7 +274,6 @@
             <div class="kpi"><b id="k_total">0</b><span>Responses</span></div>
             <div class="kpi"><b id="k_mean_err">—</b><span>Mean error (s): actual − estimate</span></div>
             <div class="kpi"><b id="k_mae">—</b><span>Mean absolute error (s)</span></div>
-            <div class="kpi"><b id="k_mape">—</b><span>Mean absolute percentage error (MAPE)</span></div>
             <div class="kpi"><b id="k_mape">—</b><span>MAPE (%)</span></div>
             <div class="kpi"><b id="k_share">—</b><span>Over vs. under</span></div>
           </div>
@@ -493,21 +492,7 @@
     }
   });
 
-  // reset disabled
-  // resetBtn?.addEventListener('click', () => {
-    if (tick){
-      clearInterval(tick);
-      tick = null;
-    }
-    t0 = null;
-    elapsed = 0;
-    estimateEl.disabled = false;
-    startBtn.disabled = false;
-    stopBtn.disabled = true;
-    resetBtn.disabled = true;
-    feedback.style.display = 'none';
-    updateUI();
-  // });
+  // reset removed
 
   estimateEl?.addEventListener('input', updateUI);
   updateUI();
@@ -572,20 +557,12 @@
     } else {
       k_mape.textContent = '—';
     }
-    // MAPE
-    const pctErrors = data.map(r => {
-      const est = Number(r.estimate_seconds);
-      const absE = Number(r.abs_error_seconds);
-      if (!est || est === 0) return null;
-      return (absE / est) * 100;
-    }).filter(x => x !== null && Number.isFinite(x));
-    const mape = pctErrors.length > 0 ? (pctErrors.reduce((a,b)=>a+b,0) / pctErrors.length) : 0;
-    document.getElementById('k_mape').textContent = mape.toFixed(1) + '%';
+
 
     k_share.textContent = `${over} over / ${under} under / ${exact} exact`;
 
     // Signed percentage error bins: (actual - estimate) / estimate * 100
-    const pctErrs = data.map(r => {
+    const signedPctErrs = data.map(r => {
       const est = Number(r.estimate_seconds);
       const err = Number(r.error_seconds);
       if (!est || est === 0) return null;
@@ -604,7 +581,7 @@
       { label: '≥ +50%',   lo: 49.01, hi: 1e9 },
     ];
 
-    const pctCounts = pctBins.map(b => pctErrs.filter(e => e >= b.lo && e <= b.hi).length);
+    const pctCounts = pctBins.map(b => signedPctErrs.filter(e => e >= b.lo && e <= b.hi).length);
     const maxC = Math.max(...pctCounts, 1);
 
     errBars.innerHTML = pctBins.map((b, i) => {
