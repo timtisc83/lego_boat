@@ -49,16 +49,16 @@
     .sub{color:var(--muted);font-size:14px;line-height:1.6}
 
     .steps{padding:14px 18px 18px;display:grid;gap:10px}
-    .step{display:flex;gap:12px;align-items:flex-start;padding:12px 12px;border-radius:12px;background:rgba(20,58,255,.04);border:1px solid rgba(0,0,0,.06)}
-    .dot{width:28px;height:28px;border-radius:10px;background:rgba(0,193,212,.18);border:1px solid rgba(0,193,212,.45);
-      display:flex;align-items:center;justify-content:center;font-weight:800;color:#143AFF;flex:0 0 auto}
+    .step{display:flex;gap:12px;align-items:flex-start;padding:12px 12px;border-radius:12px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.06)}
+    .dot{width:28px;height:28px;border-radius:10px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);
+      display:flex;align-items:center;justify-content:center;font-weight:800;color:#c4b5fd;flex:0 0 auto}
     .step p{font-size:13px;color:var(--text);line-height:1.45}
     .step p small{color:var(--muted)}
 
     .panel{padding:18px}
     .field{display:grid;gap:8px;margin-bottom:14px}
     label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
-    input[type=number]{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(0,0,0,.14);
+    input[type=number]{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
       background:rgba(0,0,0,.25);color:var(--text);outline:none;font-size:16px}
     input[type=number]:focus{border-color:rgba(124,58,237,.7);box-shadow:0 0 0 4px rgba(124,58,237,.18)}
 
@@ -96,14 +96,14 @@
 
     table{width:100%;border-collapse:collapse;font-size:12px}
     th,td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top}
-    th{text-align:left;color:#143AFF;background:rgba(0,193,212,.10)}
+    th{text-align:left;color:#c7d2fe;background:rgba(124,58,237,.10)}
     tr:hover td{background:rgba(255,255,255,.03)}
 
     .bar{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
-    .bar > i{display:block;height:100%;background:linear-gradient(90deg, rgba(20,58,255,1), rgba(0,193,212,1))}
+    .bar > i{display:block;height:100%;background:linear-gradient(90deg, rgba(124,58,237,1), rgba(34,197,94,.9))}
 
     .err{color:#fecaca;font-size:13px;display:none;margin-top:10px}
-    a{color:#143AFF}
+    a{color:#c4b5fd}
   </style>
 </head>
 <body>
@@ -206,7 +206,7 @@
          id="path34051" /><path
          d="m -65.411352,223.12004 h 10.806313 v -3.12138 h -7.368838 v -2.37068 h 6.381058 v -3.12138 h -6.381058 v -2.37067 h 7.27006 v -3.12139 h -10.707535 z"
          id="path34053" /></g></g></svg>
-<div><b>Timer</b><span></span></div></div>
+<div><b>Zeitschätzung → Timer</b><span>Institut für Organisationsdesign und Collaborative Engineering · TUHH</span></div></div>
       <div class="mini" id="status">Supabase: …</div>
     </div>
   </div>
@@ -275,13 +275,14 @@
             <div class="kpi"><b id="k_mean_err">—</b><span>Mean error (s): actual − estimate</span></div>
             <div class="kpi"><b id="k_mae">—</b><span>Mean absolute error (s)</span></div>
             <div class="kpi"><b id="k_mape">—</b><span>Mean absolute percentage error (MAPE)</span></div>
+            <div class="kpi"><b id="k_mape">—</b><span>MAPE (%)</span></div>
             <div class="kpi"><b id="k_share">—</b><span>Over vs. under</span></div>
           </div>
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start">
             <div class="kpi" style="grid-column:1 / -1">
-              <b style="font-size:14px">Distribution of signed error</b>
-              <div class="mini">Negative = underestimation (took longer). Positive = overestimation (took shorter).</div>
+              <b style="font-size:14px">Distribution of signed error (%)</b>
+              <div class="mini">Negative = took longer than estimated. Positive = finished faster than estimated. Percentage = (actual − estimate) / estimate × 100.</div>
               <div style="margin-top:10px;display:grid;gap:10px" id="errBars"></div>
             </div>
           </div>
@@ -462,7 +463,7 @@
 
     updateUI();
     // feedback disabled
-    // showFeedback(est, actual);
+    // // showFeedback disabled – no student feedback
 
     // submit
     if (!db){
@@ -491,6 +492,22 @@
       submitErr.textContent = 'Submission failed. Please try again.';
     }
   });
+
+  // reset disabled
+  // resetBtn?.addEventListener('click', () => {
+    if (tick){
+      clearInterval(tick);
+      tick = null;
+    }
+    t0 = null;
+    elapsed = 0;
+    estimateEl.disabled = false;
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    resetBtn.disabled = true;
+    feedback.style.display = 'none';
+    updateUI();
+  // });
 
   estimateEl?.addEventListener('input', updateUI);
   updateUI();
@@ -555,27 +572,43 @@
     } else {
       k_mape.textContent = '—';
     }
+    // MAPE
+    const pctErrors = data.map(r => {
+      const est = Number(r.estimate_seconds);
+      const absE = Number(r.abs_error_seconds);
+      if (!est || est === 0) return null;
+      return (absE / est) * 100;
+    }).filter(x => x !== null && Number.isFinite(x));
+    const mape = pctErrors.length > 0 ? (pctErrors.reduce((a,b)=>a+b,0) / pctErrors.length) : 0;
+    document.getElementById('k_mape').textContent = mape.toFixed(1) + '%';
+
     k_share.textContent = `${over} over / ${under} under / ${exact} exact`;
 
-    // Signed error bins
-    // bins: <=-60, -59..-31, -30..-11, -10..-1, 0, 1..10, 11..30, 31..60, >=61
-    const bins = [
-      { label: '≤ -60s', lo: -1e9, hi: -60 },
-      { label: '-59..-31', lo: -59, hi: -31 },
-      { label: '-30..-11', lo: -30, hi: -11 },
-      { label: '-10..-1', lo: -10, hi: -1 },
-      { label: '0', lo: 0, hi: 0 },
-      { label: '1..10', lo: 1, hi: 10 },
-      { label: '11..30', lo: 11, hi: 30 },
-      { label: '31..60', lo: 31, hi: 60 },
-      { label: '≥ 61', lo: 61, hi: 1e9 },
+    // Signed percentage error bins: (actual - estimate) / estimate * 100
+    const pctErrs = data.map(r => {
+      const est = Number(r.estimate_seconds);
+      const err = Number(r.error_seconds);
+      if (!est || est === 0) return null;
+      return (err / est) * 100;
+    }).filter(x => x !== null && Number.isFinite(x));
+
+    const pctBins = [
+      { label: '≤ -50%',   lo: -1e9,  hi: -50 },
+      { label: '-49…-26%', lo: -49,   hi: -26 },
+      { label: '-25…-11%', lo: -25,   hi: -11 },
+      { label: '-10…-1%',  lo: -10,   hi: -1 },
+      { label: '0%',       lo: 0,     hi: 0 },
+      { label: '+1…+10%',  lo: 0.01,  hi: 10 },
+      { label: '+11…+25%', lo: 10.01, hi: 25 },
+      { label: '+26…+49%', lo: 25.01, hi: 49 },
+      { label: '≥ +50%',   lo: 49.01, hi: 1e9 },
     ];
 
-    const counts = bins.map(b => errs.filter(e => e >= b.lo && e <= b.hi).length);
-    const maxC = Math.max(...counts, 1);
+    const pctCounts = pctBins.map(b => pctErrs.filter(e => e >= b.lo && e <= b.hi).length);
+    const maxC = Math.max(...pctCounts, 1);
 
-    errBars.innerHTML = bins.map((b, i) => {
-      const c = counts[i];
+    errBars.innerHTML = pctBins.map((b, i) => {
+      const c = pctCounts[i];
       const w = (c / maxC) * 100;
       return `
         <div style="display:grid;grid-template-columns:110px 1fr 36px;gap:10px;align-items:center">
