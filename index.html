@@ -49,16 +49,16 @@
     .sub{color:var(--muted);font-size:14px;line-height:1.6}
 
     .steps{padding:14px 18px 18px;display:grid;gap:10px}
-    .step{display:flex;gap:12px;align-items:flex-start;padding:12px 12px;border-radius:12px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.06)}
-    .dot{width:28px;height:28px;border-radius:10px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);
-      display:flex;align-items:center;justify-content:center;font-weight:800;color:#c4b5fd;flex:0 0 auto}
+    .step{display:flex;gap:12px;align-items:flex-start;padding:12px 12px;border-radius:12px;background:rgba(20,58,255,.04);border:1px solid rgba(0,0,0,.06)}
+    .dot{width:28px;height:28px;border-radius:10px;background:rgba(0,193,212,.18);border:1px solid rgba(0,193,212,.45);
+      display:flex;align-items:center;justify-content:center;font-weight:800;color:#143AFF;flex:0 0 auto}
     .step p{font-size:13px;color:var(--text);line-height:1.45}
     .step p small{color:var(--muted)}
 
     .panel{padding:18px}
     .field{display:grid;gap:8px;margin-bottom:14px}
     label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
-    input[type=number]{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
+    input[type=number]{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(0,0,0,.14);
       background:rgba(0,0,0,.25);color:var(--text);outline:none;font-size:16px}
     input[type=number]:focus{border-color:rgba(124,58,237,.7);box-shadow:0 0 0 4px rgba(124,58,237,.18)}
 
@@ -96,14 +96,14 @@
 
     table{width:100%;border-collapse:collapse;font-size:12px}
     th,td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top}
-    th{text-align:left;color:#c7d2fe;background:rgba(124,58,237,.10)}
+    th{text-align:left;color:#143AFF;background:rgba(0,193,212,.10)}
     tr:hover td{background:rgba(255,255,255,.03)}
 
     .bar{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
-    .bar > i{display:block;height:100%;background:linear-gradient(90deg, rgba(124,58,237,1), rgba(34,197,94,.9))}
+    .bar > i{display:block;height:100%;background:linear-gradient(90deg, rgba(20,58,255,1), rgba(0,193,212,1))}
 
     .err{color:#fecaca;font-size:13px;display:none;margin-top:10px}
-    a{color:#c4b5fd}
+    a{color:#143AFF}
   </style>
 </head>
 <body>
@@ -217,7 +217,7 @@
       <div class="card">
         <div class="card-h">
           <h1>Enter your estimate<br>and start your timer here</h1>
-          <p class="sub">See QR code or click link (<a href="https://shorturl.at/ny0Nv" target="_blank" rel="noreferrer">https://shorturl.at/ny0Nv</a>). Enter your estimate in <b>seconds</b>, then run the task.</p>
+          <p class="sub">See QR code. Enter your estimate in <b>seconds</b>, then run the task.</p>
         </div>
         <div class="steps">
           <div class="step"><div class="dot">1</div><p><b>Enter your estimate</b> <small>(in seconds)</small></p></div>
@@ -491,22 +491,6 @@
       submitErr.textContent = 'Submission failed. Please try again.';
     }
   });
-
-  // reset disabled
-  // resetBtn?.addEventListener('click', () => {
-    if (tick){
-      clearInterval(tick);
-      tick = null;
-    }
-    t0 = null;
-    elapsed = 0;
-    estimateEl.disabled = false;
-    startBtn.disabled = false;
-    stopBtn.disabled = true;
-    resetBtn.disabled = true;
-    feedback.style.display = 'none';
-    updateUI();
-  // });
 
   estimateEl?.addEventListener('input', updateUI);
   updateUI();
