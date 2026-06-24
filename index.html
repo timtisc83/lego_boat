@@ -5,40 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Estimate + Timer Task</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#0b0f17;
-      --panel:#0f172a;
-      --panel2:#0b1224;
-      --text:#e5e7eb;
-      --muted:#9ca3af;
-      --line:rgba(255,255,255,.08);
-      --accent:#7c3aed;
-      --accent2:#22c55e;
+      --bg:#ffffff;
+      --panel:#ffffff;
+      --panel2:#f4f4f4;
+      --text:#111111;
+      --muted:#555555;
+      --line:rgba(0,0,0,.08);
+      --accent:#00C1D4;
+      --accent2:#143AFF;
       --warn:#f59e0b;
       --bad:#ef4444;
       --good:#22c55e;
       --chip:#111827;
     }
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(1200px 700px at 20% -10%, rgba(124,58,237,.35), transparent 60%),
-                         radial-gradient(900px 600px at 90% 0%, rgba(34,197,94,.18), transparent 55%),
+    body{font-family:'Poppins',system-ui,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(1200px 700px at 15% -10%, rgba(0,193,212,.18), transparent 60%),
+                         radial-gradient(900px 600px at 92% 0%, rgba(20,58,255,.10), transparent 55%),
                          var(--bg);
          color:var(--text);min-height:100vh}
 
-    .topbar{position:sticky;top:0;z-index:10;background:linear-gradient(to bottom, rgba(11,15,23,.96), rgba(11,15,23,.75));
+    .topbar{position:sticky;top:0;z-index:10;background:linear-gradient(135deg, rgba(0,193,212,.18), rgba(20,58,255,.10));
       backdrop-filter: blur(10px);border-bottom:1px solid var(--line)}
     .topbar-inner{max-width:980px;margin:0 auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
     .brand{display:flex;align-items:baseline;gap:10px}
     .brand b{font-weight:800;letter-spacing:.2px}
     .brand span{font-size:12px;color:var(--muted)}
+    .brand svg{width:120px; min-width:120px; height:auto; display:block}
+    .brand{gap:12px}
+    .brand span{color:#3b3b3b}
+
 
     .wrap{max-width:980px;margin:0 auto;padding:22px 18px 60px}
     .grid{display:grid;grid-template-columns: 1.1fr .9fr;gap:18px;align-items:start}
     @media (max-width: 920px){.grid{grid-template-columns:1fr}}
 
-    .card{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    .card{background:linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,1));
       border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 50px rgba(0,0,0,.35);overflow:hidden}
     .card-h{padding:18px 18px 0}
     h1{font-size:28px;line-height:1.05;margin-bottom:8px}
@@ -62,7 +66,7 @@
     .btn{border:0;border-radius:12px;padding:12px 14px;font-weight:700;cursor:pointer;transition:transform .06s ease, opacity .2s ease;
       display:inline-flex;align-items:center;justify-content:center;gap:10px}
     .btn:active{transform:translateY(1px)}
-    .btn-primary{background:linear-gradient(135deg, rgba(124,58,237,1), rgba(34,197,94,.85));color:white}
+    .btn-primary{background:linear-gradient(135deg, rgba(20,58,255,1), rgba(0,193,212,1));color:white}
     .btn-ghost{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text)}
     .btn-danger{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#fecaca}
     .btn[disabled]{opacity:.5;cursor:not-allowed}
@@ -105,7 +109,104 @@
 <body>
   <div class="topbar">
     <div class="topbar-inner">
-      <div class="brand"><b>Estimate → Timer</b><span>Student link: same URL · Host: add <code>?host=true</code></span></div>
+      <div class="brand"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="96.605103mm"
+   height="82.199448mm"
+   viewBox="0 0 96.605103 82.199448"
+   version="1.1"
+   id="svg5"
+   xml:space="preserve"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="Logos final.svg"
+   inkscape:export-filename="Logo Scribble.svg"
+   inkscape:export-xdpi="900"
+   inkscape:export-ydpi="900"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     showguides="true"
+     inkscape:zoom="0.4204826"
+     inkscape:cx="537.47765"
+     inkscape:cy="420.94489"
+     inkscape:window-width="1920"
+     inkscape:window-height="1094"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"><sodipodi:guide
+       position="140.36849,161.09111"
+       orientation="1,0"
+       id="guide1881"
+       inkscape:locked="false" /><sodipodi:guide
+       position="233.80546,197.57602"
+       orientation="1,0"
+       id="guide1883"
+       inkscape:locked="false" /><sodipodi:guide
+       position="194.87339,169.32246"
+       orientation="1,0"
+       id="guide1885"
+       inkscape:locked="false" /><sodipodi:guide
+       position="199.99017,122.38151"
+       orientation="1,0"
+       id="guide1887"
+       inkscape:locked="false" /><sodipodi:guide
+       position="123.6814,178.60053"
+       orientation="0,-1"
+       id="guide1891"
+       inkscape:locked="false" /><sodipodi:guide
+       position="226.08977,144.93634"
+       orientation="1,0"
+       id="guide14996"
+       inkscape:locked="false" /><sodipodi:guide
+       position="222.31434,176.21901"
+       orientation="1,0"
+       id="guide28018"
+       inkscape:locked="false" /><sodipodi:guide
+       position="140.30945,122.64255"
+       orientation="0,-1"
+       id="guide28020"
+       inkscape:locked="false" /></sodipodi:namedview><defs
+     id="defs2" /><g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(117.23172,-149.41432)"><path
+       id="path549-01-9-8"
+       style="fill:#143aff;stroke:#000000;stroke-width:0.264583"
+       d="m -20.758898,149.5762 a 0.02963265,0.02963265 0 0 1 -0.02963,0.0296 0.02963265,0.02963265 0 0 1 -0.02963,-0.0296 0.02963265,0.02963265 0 0 1 0.02963,-0.0296 0.02963265,0.02963265 0 0 1 0.02963,0.0296 z" /><path
+       style="fill:none;fill-opacity:1;stroke:#143aff;stroke-width:1.5875;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m -116.43796,230.55898 59.621691,0.26104 h 6.8089 l 27.00638,-23.65599 v -50.64865 l -38.93207,0.22247 -54.504901,21.22023 z"
+       id="path28826-0-8-5-8"
+       sodipodi:nodetypes="cccccccc"
+       inkscape:export-filename="Logo solid"
+       inkscape:export-xdpi="900"
+       inkscape:export-ydpi="900" /><g
+       aria-label="ODCE"
+       id="text9450-0-6-9-9-7-8-9"
+       style="font-weight:bold;font-size:19.7556px;line-height:0.8;font-family:'BC Novatica TEST';-inkscape-font-specification:'BC Novatica TEST, Bold';letter-spacing:-0.5715px;fill:#143aff;stroke-width:0.539294;stroke-linecap:round"><path
+         d="m -102.06223,223.39662 c 4.504274,0 7.270058,-2.6275 7.270058,-7.32933 0,-4.70183 -2.765784,-7.32933 -7.270058,-7.32933 -4.52404,0 -7.28982,2.6275 -7.28982,7.32933 0,4.70183 2.76578,7.32933 7.28982,7.32933 z m 0,-3.14114 c -2.23239,0 -3.65479,-1.56069 -3.65479,-4.18819 0,-2.62749 1.4224,-4.18819 3.65479,-4.18819 2.212624,0 3.635027,1.5607 3.635027,4.18819 0,2.6275 -1.422403,4.18819 -3.635027,4.18819 z"
+         id="path34047" /><path
+         d="m -93.783207,223.12004 h 6.183503 c 3.753564,0 6.795927,-1.89654 6.795927,-7.05275 0,-5.15621 -3.042363,-7.05275 -6.795927,-7.05275 h -6.183503 z m 5.294501,-3.12138 h -1.857026 v -7.86273 h 1.857026 c 3.239919,0 4.049898,1.34338 4.049898,3.93136 0,2.58799 -0.809979,3.93137 -4.049898,3.93137 z"
+         id="path34049" /><path
+         d="m -73.05818,223.39662 c 3.101629,0 6.440326,-1.81752 6.637882,-5.84766 h -3.654786 c -0.217312,1.85703 -1.698982,2.70652 -2.983096,2.70652 -2.15336,0 -3.496741,-1.44216 -3.496741,-4.20794 0,-2.72628 1.343381,-4.16844 3.496741,-4.16844 1.284114,0 2.78554,0.82974 2.983096,2.70652 h 3.654786 c -0.197556,-4.0499 -3.536253,-5.84766 -6.637882,-5.84766 -4.286965,0 -7.131771,2.54848 -7.131771,7.30958 0,4.80061 2.844806,7.34908 7.131771,7.34908 z"
+         id="path34051" /><path
+         d="m -65.411352,223.12004 h 10.806313 v -3.12138 h -7.368838 v -2.37068 h 6.381058 v -3.12138 h -6.381058 v -2.37067 h 7.27006 v -3.12139 h -10.707535 z"
+         id="path34053" /></g></g></svg>
+<div><b>Zeitschätzung → Timer</b><span>Institut für Organisationsdesign und Collaborative Engineering · TUHH</span></div></div>
       <div class="mini" id="status">Supabase: …</div>
     </div>
   </div>
@@ -137,7 +238,7 @@
           <div class="row">
             <button class="btn btn-primary" id="startBtn">Start</button>
             <button class="btn btn-ghost" id="stopBtn" disabled>Stop</button>
-            <button class="btn btn-danger" id="resetBtn" disabled>Reset</button>
+            
           </div>
 
           <div class="timerBox" aria-live="polite">
@@ -149,7 +250,8 @@
             </div>
           </div>
 
-          <div class="feedback" id="feedback">
+          <!-- feedback removed -->
+<div class="feedback" id="feedback" style="display:none">
             <h3 id="fbTitle">Feedback</h3>
             <p id="fbText"></p>
           </div>
@@ -172,6 +274,7 @@
             <div class="kpi"><b id="k_total">0</b><span>Responses</span></div>
             <div class="kpi"><b id="k_mean_err">—</b><span>Mean error (s): actual − estimate</span></div>
             <div class="kpi"><b id="k_mae">—</b><span>Mean absolute error (s)</span></div>
+            <div class="kpi"><b id="k_mape">—</b><span>Mean absolute percentage error (MAPE)</span></div>
             <div class="kpi"><b id="k_share">—</b><span>Over vs. under</span></div>
           </div>
 
@@ -199,11 +302,12 @@
                   <th>Actual (s)</th>
                   <th>Error (s)<br><span class="mini">actual − estimate</span></th>
                   <th>Abs. error (s)</th>
+                  <th>Abs. error (\%)</th>
                   <th>Time</th>
                 </tr>
               </thead>
               <tbody id="rows">
-                <tr><td colspan="6" style="color:var(--muted);text-align:center;padding:18px">No responses yet</td></tr>
+                <tr><td colspan="7" style="color:var(--muted);text-align:center;padding:18px">No responses yet</td></tr>
               </tbody>
             </table>
           </div>
@@ -218,6 +322,7 @@
   const SUPABASE_KEY = 'sb_publishable_urtblTmp0Y9ikKCBm-Forg_azXo9iQ6';
 
   const TABLE = 'time_estimation_responses';
+  // NOTE: Ensure this table exists and RLS policies allow INSERT (students) and SELECT (host).
   const GAME_KEY = 'odce_time_estimation_v1';
 
   let db = null;
@@ -243,7 +348,7 @@
   const estimateEl = document.getElementById('estimate');
   const startBtn = document.getElementById('startBtn');
   const stopBtn = document.getElementById('stopBtn');
-  const resetBtn = document.getElementById('resetBtn');
+  const resetBtn = null;
 
   const timerEl = document.getElementById('timer');
   const estChip = document.getElementById('estChip');
@@ -331,7 +436,7 @@
 
     startBtn.disabled = true;
     stopBtn.disabled = false;
-    resetBtn.disabled = false;
+    
 
     feedback.style.display = 'none';
 
@@ -356,7 +461,8 @@
     stopBtn.disabled = true;
 
     updateUI();
-    showFeedback(est, actual);
+    // feedback disabled
+    // showFeedback(est, actual);
 
     // submit
     if (!db){
@@ -386,7 +492,8 @@
     }
   });
 
-  resetBtn?.addEventListener('click', () => {
+  // reset disabled
+  // resetBtn?.addEventListener('click', () => {
     if (tick){
       clearInterval(tick);
       tick = null;
@@ -399,7 +506,7 @@
     resetBtn.disabled = true;
     feedback.style.display = 'none';
     updateUI();
-  });
+  // });
 
   estimateEl?.addEventListener('input', updateUI);
   updateUI();
@@ -408,6 +515,7 @@
   const k_total = document.getElementById('k_total');
   const k_mean_err = document.getElementById('k_mean_err');
   const k_mae = document.getElementById('k_mae');
+  const k_mape = document.getElementById('k_mape');
   const k_share = document.getElementById('k_share');
   const rowsEl = document.getElementById('rows');
   const lastUp = document.getElementById('lastUp');
@@ -419,7 +527,7 @@
       .select('*')
       .eq('game_key', GAME_KEY)
       .order('created_at', { ascending: true });
-    if (error){ console.error(error); return; }
+    if (error){ console.error(error); lastUp.textContent = 'Load failed: ' + (error.message || 'permission or missing table'); return; }
     renderHost(data || []);
     lastUp.textContent = 'Last updated: ' + new Date().toLocaleTimeString();
   }
@@ -430,14 +538,22 @@
     if (n === 0){
       k_mean_err.textContent = '—';
       k_mae.textContent = '—';
+      k_mape.textContent = '—';
       k_share.textContent = '—';
       errBars.innerHTML = '<div class="mini">No data yet.</div>';
-      rowsEl.innerHTML = '<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:18px">No responses yet</td></tr>';
+      rowsEl.innerHTML = '<tr><td colspan="7" style="color:var(--muted);text-align:center;padding:18px">No responses yet</td></tr>';
       return;
     }
 
     const errs = data.map(r => Number(r.error_seconds)).filter(x => Number.isFinite(x));
     const absErrs = data.map(r => Number(r.abs_error_seconds)).filter(x => Number.isFinite(x));
+
+    const pctErrs = data.map(r => {
+      const est = Number(r.estimate_seconds);
+      const absE = Number(r.abs_error_seconds);
+      if (!Number.isFinite(est) || est <= 0 || !Number.isFinite(absE)) return null;
+      return (absE / est) * 100;
+    }).filter(x => Number.isFinite(x));
 
     const meanErr = errs.reduce((a,b)=>a+b,0) / errs.length;
     const mae = absErrs.reduce((a,b)=>a+b,0) / absErrs.length;
@@ -448,6 +564,13 @@
 
     k_mean_err.textContent = (meanErr>0?'+':'') + meanErr.toFixed(1);
     k_mae.textContent = mae.toFixed(1);
+
+    if (pctErrs.length){
+      const mape = pctErrs.reduce((a,b)=>a+b,0) / pctErrs.length;
+      k_mape.textContent = mape.toFixed(1) + '%';
+    } else {
+      k_mape.textContent = '—';
+    }
     k_share.textContent = `${over} over / ${under} under / ${exact} exact`;
 
     // Signed error bins
@@ -493,6 +616,7 @@
           <td>${act}</td>
           <td>${errStr}</td>
           <td>${absE}</td>
+          <td>${(est>0 ? (absE/est*100).toFixed(1) + '%' : '—')}</td>
           <td style="color:var(--muted)">${t}</td>
         </tr>
       `;
